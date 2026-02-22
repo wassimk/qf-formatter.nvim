@@ -46,32 +46,33 @@ local kind_icons = {
   TypeParameter = c(0xEA92),
 }
 
-local kind_names = {
-  'Text',
-  'Method',
-  'Function',
-  'Constructor',
-  'Field',
-  'Variable',
-  'Class',
-  'Interface',
-  'Module',
-  'Property',
-  'Unit',
-  'Value',
-  'Enum',
-  'Keyword',
-  'Snippet',
-  'Color',
-  'File',
-  'Reference',
-  'Folder',
-  'EnumMember',
-  'Constant',
-  'Struct',
-  'Event',
-  'Operator',
-  'TypeParameter',
+-- Default highlight links for each LSP kind
+local kind_hl_links = {
+  Text = 'String',
+  Method = 'Function',
+  Function = 'Function',
+  Constructor = 'Function',
+  Field = 'Identifier',
+  Variable = 'Identifier',
+  Class = 'Type',
+  Interface = 'Type',
+  Module = 'Include',
+  Property = 'Identifier',
+  Unit = 'Number',
+  Value = 'Number',
+  Enum = 'Type',
+  Keyword = 'Keyword',
+  Snippet = 'Special',
+  Color = 'Special',
+  File = 'Directory',
+  Reference = 'Identifier',
+  Folder = 'Directory',
+  EnumMember = 'Constant',
+  Constant = 'Constant',
+  Struct = 'Type',
+  Event = 'Special',
+  Operator = 'Operator',
+  TypeParameter = 'Type',
 }
 
 -- Pre-computed format characters (avoid vim.fn calls inside qftf callback)
@@ -79,7 +80,7 @@ local ellipsis = c(0x2026)
 local sep = c(0x2502)
 
 local defaults = {
-  filename_width = 31,
+  filename_width = 32,
 }
 
 local config = {}
@@ -156,20 +157,6 @@ local function format(info)
   return ret
 end
 
-local function detect_kind_hl_prefix()
-  local hl = vim.api.nvim_get_hl(0, { name = 'BlinkCmpKindMethod' })
-  if next(hl) ~= nil then
-    return 'BlinkCmpKind'
-  end
-
-  hl = vim.api.nvim_get_hl(0, { name = 'CmpItemKindMethod' })
-  if next(hl) ~= nil then
-    return 'CmpItemKind'
-  end
-
-  return nil
-end
-
 function M._on_qf_filetype()
   local sep = c(0x2502)
   local sep_pat = vim.fn.escape(sep, [[\]])
@@ -196,22 +183,9 @@ function M._on_qf_filetype()
   end
 
   -- LSP kind highlights
-  local prefix = config.kind_hl_prefix
-  if prefix == false then
-    return
-  end
-
-  if prefix == nil then
-    prefix = detect_kind_hl_prefix()
-    if prefix == nil then
-      return
-    end
-  end
-
-  for _, kind in ipairs(kind_names) do
-    local icon = kind_icons[kind]
-    if icon and icon ~= '' then
-      vim.fn.matchadd(prefix .. kind, after_sep .. vim.fn.escape(icon, [[\]]))
+  for kind, icon in pairs(kind_icons) do
+    if icon ~= '' then
+      vim.fn.matchadd('QfFormatterKind' .. kind, after_sep .. vim.fn.escape(icon, [[\]]))
     end
   end
 end
@@ -219,6 +193,10 @@ end
 function M.setup(opts)
   config = vim.tbl_deep_extend('force', defaults, opts or {})
   build_format_strings()
+
+  for kind, link in pairs(kind_hl_links) do
+    vim.api.nvim_set_hl(0, 'QfFormatterKind' .. kind, { link = link, default = true })
+  end
 
   _G._qf_formatter = function(info)
     local ok, result = pcall(format, info)

@@ -13,16 +13,16 @@ function M.setup_mocks()
   originals.getloclist = vim.fn.getloclist
   originals.bufname = vim.fn.bufname
   originals.matchadd = vim.fn.matchadd
-  originals.nvim_get_hl = vim.api.nvim_get_hl
+  originals.nvim_set_hl = vim.api.nvim_set_hl
 
   vim.fn.matchadd = function(group, pattern)
     table.insert(M.matchadd_calls, { group = group, pattern = pattern })
     return #M.matchadd_calls
   end
 
-  -- Default: no completion plugin detected
-  vim.api.nvim_get_hl = function(ns, opts)
-    return {}
+  M.set_hl_calls = {}
+  vim.api.nvim_set_hl = function(ns, name, val)
+    table.insert(M.set_hl_calls, { ns = ns, name = name, val = val })
   end
 end
 
@@ -44,18 +44,12 @@ function M.set_bufname(map)
   end
 end
 
-function M.set_hl_groups(groups)
-  vim.api.nvim_get_hl = function(ns, opts)
-    return groups[opts.name] or {}
-  end
-end
-
 function M.teardown_mocks()
   vim.fn.getqflist = originals.getqflist
   vim.fn.getloclist = originals.getloclist
   vim.fn.bufname = originals.bufname
   vim.fn.matchadd = originals.matchadd
-  vim.api.nvim_get_hl = originals.nvim_get_hl
+  vim.api.nvim_set_hl = originals.nvim_set_hl
 end
 
 return M

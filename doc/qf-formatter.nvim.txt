@@ -53,36 +53,67 @@ The `setup()` function accepts an options table. All values are optional.
 
 >lua
     require('qf-formatter').setup({
-      filename_width = 31,     -- max filename column width (default: 31)
-      kind_hl_prefix = nil,    -- nil = auto-detect, string = use prefix, false = disable
+      filename_width = 32, -- max filename column width (default: 32)
     })
 <
 
 
-LSP KIND HIGHLIGHT AUTO-DETECTION ~
+HIGHLIGHT GROUPS ~
 
-By default (`kind_hl_prefix = nil`), the plugin auto-detects which completion
-plugin provides highlight groups at the time the quickfix window opens. This
-handles lazy-loaded completion plugins correctly.
+The plugin defines highlight groups that you can customize in your colorscheme
+or config.
 
-Detection order:
+**Quickfix structure:**
 
-1. **blink.cmp** — checks for `BlinkCmpKindMethod` highlight group
-2. **nvim-cmp** — checks for `CmpItemKindMethod` highlight group
-3. If neither is found, LSP kind highlighting is silently skipped
+  Group       Default Link   Description
+  ----------- -------------- -------------------------
+  Directory   —              Filename column
+  Delimiter   —              │ separators
+  LineNr      —              Line and column numbers
+**Diagnostic icons:**
 
-You can override auto-detection:
+  Group                 Description
+  --------------------- --------------
+  DiagnosticSignError   Error icon
+  DiagnosticSignWarn    Warning icon
+  DiagnosticSignInfo    Info icon
+  DiagnosticSignHint    Hint icon
+**LSP kind icons** use the `QfFormatterKind{Name}` pattern with sensible
+defaults:
+
+  Group                          Default Link
+  ------------------------------ --------------
+  QfFormatterKindClass           Type
+  QfFormatterKindConstant        Constant
+  QfFormatterKindConstructor     Function
+  QfFormatterKindEnum            Type
+  QfFormatterKindEnumMember      Constant
+  QfFormatterKindEvent           Special
+  QfFormatterKindField           Identifier
+  QfFormatterKindFile            Directory
+  QfFormatterKindFolder          Directory
+  QfFormatterKindFunction        Function
+  QfFormatterKindInterface       Type
+  QfFormatterKindKeyword         Keyword
+  QfFormatterKindMethod          Function
+  QfFormatterKindModule          Include
+  QfFormatterKindOperator        Operator
+  QfFormatterKindProperty        Identifier
+  QfFormatterKindReference       Identifier
+  QfFormatterKindSnippet         Special
+  QfFormatterKindStruct          Type
+  QfFormatterKindText            String
+  QfFormatterKindTypeParameter   Type
+  QfFormatterKindUnit            Number
+  QfFormatterKindValue           Number
+  QfFormatterKindVariable        Identifier
+  QfFormatterKindColor           Special
+All `QfFormatterKind*` groups are defined with `default = true`, so any
+highlight set by your colorscheme takes priority. To customize a kind, override
+the group in your config:
 
 >lua
-    -- Use a specific highlight prefix
-    require('qf-formatter').setup({
-      kind_hl_prefix = 'BlinkCmpKind',
-    })
-    
-    -- Disable LSP kind highlighting entirely
-    require('qf-formatter').setup({
-      kind_hl_prefix = false,
-    })
+    vim.api.nvim_set_hl(0, 'QfFormatterKindMethod', { fg = '#82aaff' })
 <
 
 
