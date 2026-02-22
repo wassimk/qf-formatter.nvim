@@ -312,67 +312,38 @@ describe('qf-formatter', function()
       assert.is_true(diagnostic_groups['DiagnosticSignHint'] or false)
     end)
 
-    it('adds LSP kind highlights when blink.cmp is detected', function()
-      helpers.set_hl_groups({ BlinkCmpKindMethod = { fg = '#ffffff' } })
+    it('adds QfFormatterKind highlights for LSP kinds', function()
       qf_formatter.setup()
       qf_formatter._on_qf_filetype()
 
-      local found = false
+      local kind_groups = {}
       for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group == 'BlinkCmpKindMethod' then
-          found = true
-          break
+        if call.group:match('^QfFormatterKind') then
+          kind_groups[call.group] = true
         end
       end
-      assert.is_true(found)
+      assert.is_true(kind_groups['QfFormatterKindMethod'] or false)
+      assert.is_true(kind_groups['QfFormatterKindClass'] or false)
+      assert.is_true(kind_groups['QfFormatterKindFunction'] or false)
+      assert.is_true(kind_groups['QfFormatterKindVariable'] or false)
+      assert.is_true(kind_groups['QfFormatterKindConstant'] or false)
     end)
 
-    it('adds LSP kind highlights when nvim-cmp is detected', function()
-      helpers.set_hl_groups({ CmpItemKindMethod = { fg = '#ffffff' } })
+    it('defines QfFormatterKind highlight groups during setup', function()
       qf_formatter.setup()
-      qf_formatter._on_qf_filetype()
 
-      local found = false
-      for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group == 'CmpItemKindMethod' then
-          found = true
-          break
+      local hl_names = {}
+      for _, call in ipairs(helpers.set_hl_calls) do
+        if call.name:match('^QfFormatterKind') then
+          hl_names[call.name] = call.val
         end
       end
-      assert.is_true(found)
-    end)
+      assert.is_not_nil(hl_names['QfFormatterKindMethod'])
+      assert.equals('Function', hl_names['QfFormatterKindMethod'].link)
+      assert.is_true(hl_names['QfFormatterKindMethod'].default)
 
-    it('skips LSP kind highlights when no completion plugin is detected', function()
-      qf_formatter.setup()
-      qf_formatter._on_qf_filetype()
-
-      for _, call in ipairs(helpers.matchadd_calls) do
-        assert.falsy(call.group:match('^BlinkCmpKind'))
-        assert.falsy(call.group:match('^CmpItemKind'))
-      end
-    end)
-
-    it('uses explicit kind_hl_prefix when configured', function()
-      qf_formatter.setup({ kind_hl_prefix = 'CustomKind' })
-      qf_formatter._on_qf_filetype()
-
-      local found = false
-      for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group == 'CustomKindMethod' then
-          found = true
-          break
-        end
-      end
-      assert.is_true(found)
-    end)
-
-    it('disables LSP kind highlights when kind_hl_prefix is false', function()
-      qf_formatter.setup({ kind_hl_prefix = false })
-      qf_formatter._on_qf_filetype()
-
-      for _, call in ipairs(helpers.matchadd_calls) do
-        assert.falsy(call.group:match('Kind'))
-      end
+      assert.is_not_nil(hl_names['QfFormatterKindClass'])
+      assert.equals('Type', hl_names['QfFormatterKindClass'].link)
     end)
   end)
 end)
