@@ -42,30 +42,31 @@ require('qf-formatter').setup({
 
 ### Highlight Groups
 
-The plugin defines highlight groups that you can customize in your colorscheme or config.
+All highlights are defined with `default = true`, so your colorscheme always takes priority. Every group is prefixed with `QfFormatter` so you can customize the quickfix appearance without affecting the rest of Neovim.
 
 **Quickfix structure:**
 
 | Group | Default Link | Description |
 |-------|-------------|-------------|
-| `Directory` | — | Filename column |
-| `Delimiter` | — | `│` separators |
-| `LineNr` | — | Line and column numbers |
+| `QfFormatterFilename` | `Directory` | Filename column |
+| `QfFormatterSeparator` | `Delimiter` | `│` separators |
+| `QfFormatterLineNr` | `LineNr` | Line and column numbers |
 
 **Diagnostic icons:**
 
-| Group | Description |
+| Group | Default Link |
 |-------|-------------|
-| `DiagnosticSignError` | Error icon |
-| `DiagnosticSignWarn` | Warning icon |
-| `DiagnosticSignInfo` | Info icon |
-| `DiagnosticSignHint` | Hint icon |
+| `QfFormatterError` | `DiagnosticSignError` |
+| `QfFormatterWarn` | `DiagnosticSignWarn` |
+| `QfFormatterInfo` | `DiagnosticSignInfo` |
+| `QfFormatterHint` | `DiagnosticSignHint` |
 
-**LSP kind icons** use the `QfFormatterKind{Name}` pattern with sensible defaults:
+**LSP kind icons:**
 
 | Group | Default Link |
 |-------|-------------|
 | `QfFormatterKindClass` | `Type` |
+| `QfFormatterKindColor` | `Special` |
 | `QfFormatterKindConstant` | `Constant` |
 | `QfFormatterKindConstructor` | `Function` |
 | `QfFormatterKindEnum` | `Type` |
@@ -89,12 +90,12 @@ The plugin defines highlight groups that you can customize in your colorscheme o
 | `QfFormatterKindUnit` | `Number` |
 | `QfFormatterKindValue` | `Number` |
 | `QfFormatterKindVariable` | `Identifier` |
-| `QfFormatterKindColor` | `Special` |
 
-All `QfFormatterKind*` groups are defined with `default = true`, so any highlight set by your colorscheme takes priority. To customize a kind, override the group in your config:
+To customize any group, override it in your config:
 
 ```lua
-vim.api.nvim_set_hl(0, 'QfFormatterKindMethod', { fg = '#82aaff' })
+vim.api.nvim_set_hl(0, 'QfFormatterFilename', { fg = '#82aaff' })
+vim.api.nvim_set_hl(0, 'QfFormatterKindMethod', { link = 'BlinkCmpKindMethod' })
 ```
 
 ## 🔧 Development

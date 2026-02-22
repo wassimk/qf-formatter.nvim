@@ -161,24 +161,17 @@ function M._on_qf_filetype()
   local sep = c(0x2502)
   local sep_pat = vim.fn.escape(sep, [[\]])
 
-  vim.fn.matchadd('Directory', '^[^' .. sep .. ']*')
-  vim.fn.matchadd('Delimiter', sep_pat)
-  vim.fn.matchadd('LineNr', sep_pat .. [[\zs[^]] .. sep .. [[]*\ze]] .. sep_pat)
+  vim.fn.matchadd('QfFormatterFilename', '^[^' .. sep .. ']*')
+  vim.fn.matchadd('QfFormatterSeparator', sep_pat)
+  vim.fn.matchadd('QfFormatterLineNr', sep_pat .. [[\zs[^]] .. sep .. [[]*\ze]] .. sep_pat)
 
   -- Diagnostic sign highlights
-  local diagnostic_map = {
-    Error = 'DiagnosticSignError',
-    Warn = 'DiagnosticSignWarn',
-    Info = 'DiagnosticSignInfo',
-    Hint = 'DiagnosticSignHint',
-  }
-
   local after_sep = sep_pat .. '[^' .. sep .. ']*' .. sep_pat .. [[\zs ]]
 
-  for name, hl in pairs(diagnostic_map) do
+  for name, _ in pairs(diagnostic_signs_full) do
     local icon = diagnostic_signs_full[name]
     if icon then
-      vim.fn.matchadd(hl, after_sep .. vim.fn.escape(icon, [[\]]))
+      vim.fn.matchadd('QfFormatter' .. name, after_sep .. vim.fn.escape(icon, [[\]]))
     end
   end
 
@@ -194,6 +187,18 @@ function M.setup(opts)
   config = vim.tbl_deep_extend('force', defaults, opts or {})
   build_format_strings()
 
+  -- Structure highlights
+  vim.api.nvim_set_hl(0, 'QfFormatterFilename', { link = 'Directory', default = true })
+  vim.api.nvim_set_hl(0, 'QfFormatterSeparator', { link = 'Delimiter', default = true })
+  vim.api.nvim_set_hl(0, 'QfFormatterLineNr', { link = 'LineNr', default = true })
+
+  -- Diagnostic highlights
+  vim.api.nvim_set_hl(0, 'QfFormatterError', { link = 'DiagnosticSignError', default = true })
+  vim.api.nvim_set_hl(0, 'QfFormatterWarn', { link = 'DiagnosticSignWarn', default = true })
+  vim.api.nvim_set_hl(0, 'QfFormatterInfo', { link = 'DiagnosticSignInfo', default = true })
+  vim.api.nvim_set_hl(0, 'QfFormatterHint', { link = 'DiagnosticSignHint', default = true })
+
+  -- LSP kind highlights
   for kind, link in pairs(kind_hl_links) do
     vim.api.nvim_set_hl(0, 'QfFormatterKind' .. kind, { link = link, default = true })
   end
