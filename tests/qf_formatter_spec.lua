@@ -254,13 +254,13 @@ describe('qf-formatter', function()
   end)
 
   describe('_on_qf_filetype', function()
-    it('adds Directory highlight for filenames', function()
+    it('adds QfFormatterFilename highlight for filenames', function()
       qf_formatter.setup()
       qf_formatter._on_qf_filetype()
 
       local found = false
       for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group == 'Directory' then
+        if call.group == 'QfFormatterFilename' then
           found = true
           break
         end
@@ -268,13 +268,13 @@ describe('qf-formatter', function()
       assert.is_true(found)
     end)
 
-    it('adds Delimiter highlight for separators', function()
+    it('adds QfFormatterSeparator highlight for separators', function()
       qf_formatter.setup()
       qf_formatter._on_qf_filetype()
 
       local found = false
       for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group == 'Delimiter' then
+        if call.group == 'QfFormatterSeparator' then
           found = true
           break
         end
@@ -282,13 +282,13 @@ describe('qf-formatter', function()
       assert.is_true(found)
     end)
 
-    it('adds LineNr highlight for line:col', function()
+    it('adds QfFormatterLineNr highlight for line:col', function()
       qf_formatter.setup()
       qf_formatter._on_qf_filetype()
 
       local found = false
       for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group == 'LineNr' then
+        if call.group == 'QfFormatterLineNr' then
           found = true
           break
         end
@@ -296,20 +296,20 @@ describe('qf-formatter', function()
       assert.is_true(found)
     end)
 
-    it('adds DiagnosticSign highlights', function()
+    it('adds QfFormatter diagnostic highlights', function()
       qf_formatter.setup()
       qf_formatter._on_qf_filetype()
 
       local diagnostic_groups = {}
       for _, call in ipairs(helpers.matchadd_calls) do
-        if call.group:match('^DiagnosticSign') then
+        if call.group:match('^QfFormatter[EWIH]') then
           diagnostic_groups[call.group] = true
         end
       end
-      assert.is_true(diagnostic_groups['DiagnosticSignError'] or false)
-      assert.is_true(diagnostic_groups['DiagnosticSignWarn'] or false)
-      assert.is_true(diagnostic_groups['DiagnosticSignInfo'] or false)
-      assert.is_true(diagnostic_groups['DiagnosticSignHint'] or false)
+      assert.is_true(diagnostic_groups['QfFormatterError'] or false)
+      assert.is_true(diagnostic_groups['QfFormatterWarn'] or false)
+      assert.is_true(diagnostic_groups['QfFormatterInfo'] or false)
+      assert.is_true(diagnostic_groups['QfFormatterHint'] or false)
     end)
 
     it('adds QfFormatterKind highlights for LSP kinds', function()
@@ -329,20 +329,31 @@ describe('qf-formatter', function()
       assert.is_true(kind_groups['QfFormatterKindConstant'] or false)
     end)
 
-    it('defines QfFormatterKind highlight groups during setup', function()
+    it('defines all QfFormatter highlight groups during setup', function()
       qf_formatter.setup()
 
       local hl_names = {}
       for _, call in ipairs(helpers.set_hl_calls) do
-        if call.name:match('^QfFormatterKind') then
+        if call.name:match('^QfFormatter') then
           hl_names[call.name] = call.val
         end
       end
-      assert.is_not_nil(hl_names['QfFormatterKindMethod'])
+
+      -- Structure highlights
+      assert.equals('Directory', hl_names['QfFormatterFilename'].link)
+      assert.is_true(hl_names['QfFormatterFilename'].default)
+      assert.equals('Delimiter', hl_names['QfFormatterSeparator'].link)
+      assert.equals('LineNr', hl_names['QfFormatterLineNr'].link)
+
+      -- Diagnostic highlights
+      assert.equals('DiagnosticSignError', hl_names['QfFormatterError'].link)
+      assert.equals('DiagnosticSignWarn', hl_names['QfFormatterWarn'].link)
+      assert.equals('DiagnosticSignInfo', hl_names['QfFormatterInfo'].link)
+      assert.equals('DiagnosticSignHint', hl_names['QfFormatterHint'].link)
+
+      -- LSP kind highlights
       assert.equals('Function', hl_names['QfFormatterKindMethod'].link)
       assert.is_true(hl_names['QfFormatterKindMethod'].default)
-
-      assert.is_not_nil(hl_names['QfFormatterKindClass'])
       assert.equals('Type', hl_names['QfFormatterKindClass'].link)
     end)
   end)
