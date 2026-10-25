@@ -1,4 +1,5 @@
-*qf-formatter.nvim.txt*       For NVIM v0.10.0      Last change: 2026 March 08
+*qf-formatter.nvim.txt*
+                              For NVIM v0.10.0    Last change: 2026 October 25
 
 ==============================================================================
 Table of Contents                        *qf-formatter.nvim-table-of-contents*

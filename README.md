@@ -2,7 +2,7 @@
 
 Beautiful quickfix and location list formatting with diagnostic and LSP kind icons.
 
-<img src="demo/diagnostics.jpg" alt="Quickfix list with diagnostic entries showing error, warning, info, and hint icons" width="700">
+<img src="demo/qf-formatter.gif" alt="Quickfix list with diagnostic icons and location list with LSP kind icons" width="700">
 
 ## 📋 Requirements
 
